@@ -24,11 +24,11 @@ void buildDeck(String fileName) {
 
 void importFromJSON (String fileName) {
     var path = fileName;
-    HttpRequest.getString(path).then(createDeck);
+    HttpRequest.getString(path).then(generateDeck);
 
 }
 
-void createDeck (String cardList) {
+void generateDeck (String cardList) {
       List<Map> cards = JSON.decode(cardList); // import json into a list of Maps
 
       List<BoonCard> deck = new List<BoonCard>();  // create empty deck
@@ -75,14 +75,12 @@ void loadDeckOld(List<BoonCard> deck) {
 
 
 // Render all cards on screen
+
 void loadDeck(List<BoonCard> deck) {
-// get the type of deck by reading the type from the first card (all cards have same type in decks)
-String deckType = deck[0]._type;
-
-// Now target the appropriate div and table
-Element deckTable = querySelector('div#${deckType} table.deck-table');
-
-List<String> cardBuilder = [];
+String deckType = deck[0]._type; // get the type of deck by reading the type from the first card (all cards have same type in decks)
+Element deckTable = querySelector('div#${deckType} table.deck-table'); // Now target the appropriate div and table
+List<TableRowElement> cardBuilder = [];
+TableRowElement blank = new TableRowElement();
 int deckSize = deck.length;
 String cardText;
 int counter = 0;
@@ -90,32 +88,38 @@ int counter = 0;
 deck.forEach((card){
   counter++;
   cardText= "${card._cardName} (${card._set}) [x${card._amount}]";
-
-  if ( cardBuilder.isEmpty && counter == deckSize)  {
-    cardBuilder.add(cardText);
-    cardBuilder.add("--");
-  } else {
-    cardBuilder.add(cardText);
-  }
-
+  var td = new TableCellElement();
+   td..setAttribute("class","card")
+        ..setAttribute("data-name", "${card._cardName}")
+        ..setAttribute("data-set", "${card._set}")
+        ..setAttribute("data-amount", "${card._amount}")
+        ..text = cardText;
+    if ( cardBuilder.isEmpty && counter == deckSize)  {
+      cardBuilder.add(td);
+      cardBuilder.add(blank);
+    } else {
+      cardBuilder.add(td);
+    }
   if (cardBuilder.length == 2) {
-     var tr = new TableRowElement();
-        tr..setAttribute("class","card")
-           ..setAttribute("data-name", "${card._cardName}")
-            ..setAttribute("data-set", "${card._set}")
-            ..setAttribute("data-amount", "${card._amount}");
-         tr.children.addAll ( [
-             new TableCellElement()..text = cardBuilder[0],
-             new TableCellElement()..text = cardBuilder[1] ]);
-         deckTable.children.add(tr);
-         // clear list
-         cardBuilder.clear();
-   }
+        cardBuilder[0].onClick.listen(pickCard);
+        cardBuilder[1].onClick.listen(pickCard);
+       var tr = new TableRowElement();
+       tr.children.addAll ( [ cardBuilder[0], cardBuilder[1] ]);
+        deckTable.children.add(tr);
+        cardBuilder.clear();   // clear list
+   }  // endif
 
-});
+}); // end forEach
  querySelector('div#${deckType} p.boon-type').text = deckType;
-}
+} // end loadDeck
 
+void pickCard (Event e) {
+  String cardName = (e.target as TableCellElement).attributes['data-name'].toString();
+  Element card = new DivElement()..text = cardName;
+  querySelector('#character-deck').children.add(card);
+
+  //window.alert("You clicked on ${e.target.text}");
+}
 
 /***********
  ** Classes **
