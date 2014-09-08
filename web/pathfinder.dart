@@ -50,31 +50,6 @@ void generateDeck (String cardList) {
 
 
 // Render all cards on screen
-void loadDeckOld(List<BoonCard> deck) {
-  // get the type of deck by reading the type from the first card (all cards have same type in decks)
-  String deckType = deck[0]._type;
-
-  // Now target the appropriate div and table
-  Element deckTable = querySelector('div#${deckType} table.deck-table');
-  print('div#${deckType} table.deck-table');
-
-  deck.forEach((card) {
-      var tr = new TableRowElement();
-       tr..setAttribute("class","card")
-          ..setAttribute("data-name", "${card._cardName}")
-           ..setAttribute("data-set", "${card._set}")
-           ..setAttribute("data-amount", "${card._amount}");
-        tr.children.addAll([
-            new TableCellElement()..text = '${card._cardName}',
-            new TableCellElement()..text = '${card._set}',
-            new TableCellElement()..text = '${card._amount}']);
-        deckTable.children.add(tr);
-    });
-    querySelector('div#${deckType} p.boon-type').text = deckType;
-}
-
-
-// Render all cards on screen
 
 void loadDeck(List<BoonCard> deck) {
 String deckType = deck[0]._type; // get the type of deck by reading the type from the first card (all cards have same type in decks)
@@ -116,9 +91,14 @@ deck.forEach((card){
 void pickCard (Event e) {
   String cardName = (e.target as TableCellElement).attributes['data-name'].toString();
   Element card = new DivElement()..text = cardName;
+  card.setAttribute("class",  "card-in-deck");
+  card.onClick.listen(removeCardFromDeck);
   querySelector('#character-deck').children.add(card);
+}
 
-  //window.alert("You clicked on ${e.target.text}");
+void removeCardFromDeck(Event e) {
+  querySelector('#character-deck').children.remove(e.target);
+
 }
 
 /***********
