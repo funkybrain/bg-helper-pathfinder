@@ -7,20 +7,27 @@ BoonCard cardPicked;
 
 void main() {
   ButtonElement genButton = querySelector('#genButton');
-  buildDeck("weapons.json");
-  buildDeck("spells.json");
-  buildDeck("allies.json");
-  buildDeck("armour.json");
-  buildDeck("blessings.json");
-  buildDeck("loot.json");
-  buildDeck("items.json");
+  buildWeaponDeck();
+  querySelector('#weapons').onClick.listen(buildDeck);
+  querySelector('#armour').onClick.listen(buildDeck);
+  querySelector('#allies').onClick.listen(buildDeck);
+  querySelector('#items').onClick.listen(buildDeck);
+  querySelector('#spells').onClick.listen(buildDeck);
+  querySelector('#loot').onClick.listen(buildDeck);
+  querySelector('#blessings').onClick.listen(buildDeck);
+
 }
 
-
-void buildDeck(String fileName) {
+void buildDeck(Event e) {
+  String fileName = (e.target as ParagraphElement).attributes['id'].toString();
+  fileName = fileName + '.json';
+  // print (fileName);
   importFromJSON(fileName);
 }
 
+void buildWeaponDeck() {
+  importFromJSON("weapons.json");
+}
 
 void importFromJSON (String fileName) {
     var path = fileName;
@@ -30,37 +37,30 @@ void importFromJSON (String fileName) {
 
 void generateDeck (String cardList) {
       List<Map> cards = JSON.decode(cardList); // import json into a list of Maps
-
       List<BoonCard> deck = new List<BoonCard>();  // create empty deck
-
       String deckType = cards[0]["type"]; // check the type of deck loaded from json
 
       for (int i = 1;  i < cards.length;  i++) {
         BoonCard card = new BoonCard(deckType, cards[i]["name"], cards[i]["set"],cards[i]["amount"]) ;
         deck.add(card);
-        //print (card._cardName);
-        //print("deck is long by "  + deck.length.toString());
-
       }
-
-
-      // render decks to page
-      loadDeck(deck);
+      loadDeck(deck);       // render decks to page
 }
 
 
-// Render all cards on screen
-
+// Render deck on screen
 void loadDeck(List<BoonCard> deck) {
 String deckType = deck[0]._type; // get the type of deck by reading the type from the first card (all cards have same type in decks)
-Element deckTable = querySelector('div#${deckType} table.deck-table'); // Now target the appropriate div and table
-List<TableRowElement> cardBuilder = [];
-TableRowElement blank = new TableRowElement();
+TableElement deckTable = querySelector(' table.deck-table'); // Now target the appropriate div and table
+deckTable.children.clear(); // clear previous table
+List<TableCellElement> cardBuilder = [];
+TableCellElement blank = new TableCellElement()..text = ""; // blank cell
+
 int deckSize = deck.length;
 String cardText;
 int counter = 0;
 
-deck.forEach((card){
+deck.forEach((card) {
   counter++;
   cardText= "${card._cardName} (${card._set}) [x${card._amount}]";
   var td = new TableCellElement();
@@ -69,7 +69,10 @@ deck.forEach((card){
         ..setAttribute("data-set", "${card._set}")
         ..setAttribute("data-amount", "${card._amount}")
         ..text = cardText;
-    if ( cardBuilder.isEmpty && counter == deckSize)  {
+
+  //  print ('${td.attributes.keys} : ${td.attributes.values}');
+
+   if ( cardBuilder.isEmpty && counter == deckSize)  {
       cardBuilder.add(td);
       cardBuilder.add(blank);
     } else {
@@ -84,7 +87,7 @@ deck.forEach((card){
         cardBuilder.clear();   // clear list
    }  // endif
 
-}); // end forEach
+}); // end foreach
  querySelector('div#${deckType} p.boon-type').text = deckType;
 } // end loadDeck
 

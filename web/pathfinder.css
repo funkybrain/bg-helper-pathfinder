@@ -25,14 +25,12 @@ h1, p {
   width: 96%;
 }
 
-.deck-container {
-  float:left;
-  margin: 0 5px 0 5px;
-  padding: 0 5px 0 5px;
+#deck-box {
+  display: inline-block;
 }
 
-#allies, #blessings{
-  clear:left;
+.deck-container {
+  float:left;
   margin: 0 5px 0 5px;
   padding: 0 5px 0 5px;
 }
@@ -47,12 +45,19 @@ h1, p {
 
 p.boon-type {
   text-transform: capitalize;
-  font-size: 22px;
+  font-size: 16px;
+  display: inline-block;
+  padding: 5px;
+}
 
+p.header {
+  font-size: 16px;
+  display: inline-block;
+  padding: 5px 5px 5px 5px;
 }
 
 table {
-  width: 400px;
+  width: 450px;
   border-collapse: collapse;
   border-bottom: 2px solid #dd8c11;
   border-top: 2px solid #dd8c11;
@@ -76,7 +81,11 @@ td, th {
 }
 
 td:hover { /* th:hover also if you wish */
-  background: yellow;
+  background-color: #dd8c11;
+}
+
+.boon-type:hover { /* th:hover also if you wish */
+  background-color: #dd8c11;
 }
 
 div.card-in-deck:hover {
