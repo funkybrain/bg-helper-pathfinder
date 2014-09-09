@@ -14,8 +14,8 @@ h1, p {
 
 #character-sheet {
   float: left;
-  width: 400px;
-  height: 600px;
+  width: 450px;
+  height: 500px;
   margin: 0 5px 0 5px;
   padding: 0 5px 0 5px;
 }
@@ -50,10 +50,19 @@ p.boon-type {
   padding: 5px;
 }
 
+.reset {
+  font-weight: normal;
+}
+
+.selected {
+  font-weight: bold;
+  border-bottom: 2px solid #dd8c11;
+}
+
 p.header {
   font-size: 16px;
   display: inline-block;
-  padding: 5px 5px 5px 5px;
+  margin: 5px 0 5px 0;
 }
 
 table {
@@ -86,6 +95,8 @@ td:hover { /* th:hover also if you wish */
 
 .boon-type:hover { /* th:hover also if you wish */
   background-color: #dd8c11;
+  cursor: pointer;
+  font-weight: bold;
 }
 
 div.card-in-deck:hover {

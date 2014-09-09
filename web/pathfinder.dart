@@ -19,6 +19,10 @@ void main() {
 }
 
 void buildDeck(Event e) {
+ // clear all headers and set this one to bold
+ querySelectorAll('#deck-box p.boon-type').forEach((e) => e.setAttribute("class", "boon-type reset"));
+ (e.target as ParagraphElement).setAttribute("class", "boon-type selected");
+
   String fileName = (e.target as ParagraphElement).attributes['id'].toString();
   fileName = fileName + '.json';
   // print (fileName);
@@ -26,6 +30,7 @@ void buildDeck(Event e) {
 }
 
 void buildWeaponDeck() {
+  querySelector('#deck-box p.boon-type').setAttribute("class", "boon-type selected");
   importFromJSON("weapons.json");
 }
 
@@ -53,6 +58,7 @@ void loadDeck(List<BoonCard> deck) {
 String deckType = deck[0]._type; // get the type of deck by reading the type from the first card (all cards have same type in decks)
 TableElement deckTable = querySelector(' table.deck-table'); // Now target the appropriate div and table
 deckTable.children.clear(); // clear previous table
+
 List<TableCellElement> cardBuilder = [];
 TableCellElement blank = new TableCellElement()..text = ""; // blank cell
 
@@ -61,16 +67,8 @@ String cardText;
 int counter = 0;
 
 deck.forEach((card) {
-  counter++;
-  cardText= "${card._cardName} (${card._set}) [x${card._amount}]";
-  var td = new TableCellElement();
-   td..setAttribute("class","card")
-        ..setAttribute("data-name", "${card._cardName}")
-        ..setAttribute("data-set", "${card._set}")
-        ..setAttribute("data-amount", "${card._amount}")
-        ..text = cardText;
-
-  //  print ('${td.attributes.keys} : ${td.attributes.values}');
+   counter++;
+   TableCellElement td = createTableCell(card);
 
    if ( cardBuilder.isEmpty && counter == deckSize)  {
       cardBuilder.add(td);
@@ -91,6 +89,28 @@ deck.forEach((card) {
  querySelector('div#${deckType} p.boon-type').text = deckType;
 } // end loadDeck
 
+TableCellElement createTableCell (card) {
+  String cardText= "${card._cardName} (${card._set}) [x${card._amount}]";
+  var td = new TableCellElement();
+   td..setAttribute("class","card")
+        ..setAttribute("data-name", "${card._cardName}")
+        ..setAttribute("data-set", "${card._set}")
+        ..setAttribute("data-amount", "${card._amount}")
+        ..text = cardText;
+   return td;
+}
+
+TableCellElement createTableCellNameOnly (card) {
+  String cardText= "${card._cardName} (${card._set})";
+  var td = new TableCellElement();
+   td..setAttribute("class","card")
+        ..setAttribute("data-name", "${card._cardName}")
+        ..setAttribute("data-set", "${card._set}")
+        ..setAttribute("data-amount", "${card._amount}")
+        ..text = cardText;
+   return td;
+}
+
 void pickCard (Event e) {
   String cardName = (e.target as TableCellElement).attributes['data-name'].toString();
   Element card = new DivElement()..text = cardName;
@@ -99,10 +119,27 @@ void pickCard (Event e) {
   querySelector('#character-deck').children.add(card);
 }
 
+void addCardToCharacterDeck (Event e) {
+  TableElement deckTable = querySelector(' div#character-deck table.deck-table'); // target the appropriate div and table
+  // cardcount++
+  // if card count odd
+    // create new table row
+   // create table cell
+   // add table cell
+  // elseif card count even
+    // add table cell
+}
+
+void removeCardFromCharacterDeck(Event e) {
+  // cardcount--
+}
+
 void removeCardFromDeck(Event e) {
   querySelector('#character-deck').children.remove(e.target);
 
 }
+
+//TODO https://www.dartlang.org/samples/#html5_persistence
 
 /***********
  ** Classes **
