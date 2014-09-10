@@ -1,13 +1,14 @@
 import 'dart:html';
 import 'dart:convert' show JSON;
 
-List<BoonCard> WeaponDeck = new List<BoonCard>();
-BoonCard cardPicked;
-
+List<BoonCard> characterDeck = new List<BoonCard>();
+int characterCardCount = 0;
+ButtonElement saveDeck = querySelector('#save-deck');
 
 void main() {
-  ButtonElement genButton = querySelector('#genButton');
+  if(characterCardCount == 0 )  saveDeck.classes.toggle("hide");
   buildWeaponDeck();
+
   querySelector('#weapons').onClick.listen(buildDeck);
   querySelector('#armour').onClick.listen(buildDeck);
   querySelector('#allies').onClick.listen(buildDeck);
@@ -48,6 +49,7 @@ void generateDeck (String cardList) {
       for (int i = 1;  i < cards.length;  i++) {
         BoonCard card = new BoonCard(deckType, cards[i]["name"], cards[i]["set"],cards[i]["amount"]) ;
         deck.add(card);
+
       }
       loadDeck(deck);       // render decks to page
 }
@@ -56,11 +58,12 @@ void generateDeck (String cardList) {
 // Render deck on screen
 void loadDeck(List<BoonCard> deck) {
 String deckType = deck[0]._type; // get the type of deck by reading the type from the first card (all cards have same type in decks)
+
 TableElement deckTable = querySelector(' table.deck-table'); // Now target the appropriate div and table
 deckTable.children.clear(); // clear previous table
 
 List<TableCellElement> cardBuilder = [];
-TableCellElement blank = new TableCellElement()..text = ""; // blank cell
+TableCellElement blank = new TableCellElement(); // blank cell
 
 int deckSize = deck.length;
 String cardText;
@@ -77,8 +80,8 @@ deck.forEach((card) {
       cardBuilder.add(td);
     }
   if (cardBuilder.length == 2) {
-        cardBuilder[0].onClick.listen(pickCard);
-        cardBuilder[1].onClick.listen(pickCard);
+        cardBuilder[0].onClick.listen(addCardToCharacterDeck);
+        cardBuilder[1].onClick.listen(addCardToCharacterDeck);
        var tr = new TableRowElement();
        tr.children.addAll ( [ cardBuilder[0], cardBuilder[1] ]);
         deckTable.children.add(tr);
@@ -89,9 +92,56 @@ deck.forEach((card) {
  querySelector('div#${deckType} p.boon-type').text = deckType;
 } // end loadDeck
 
-TableCellElement createTableCell (card) {
+
+
+
+
+void addCardToCharacterDeck (Event e) {
+  String cardType = (e.target as TableCellElement).attributes['data-type'].toString();
+  String cardName = (e.target as TableCellElement).attributes['data-name'].toString();
+  String cardSet = (e.target as TableCellElement).attributes['data-set'].toString();
+  BoonCard card = new BoonCard(cardType, cardName, cardSet, 1);
+  characterDeck.add(card); // add card to character deck
+  addCardToCharacterDeckTable(card); // add card to table
+
+}
+
+void addCardToCharacterDeckTable (BoonCard card) {
+
+  TableElement characterDeckTable = querySelector(' table.character-deck-table'); // target the appropriate div and table
+  TableCellElement td = createTableCellNameOnly(card); // create table cell
+  td.classes.add( "card-in-deck");
+
+  td.onClick.listen( (e) {
+    characterDeck.remove(card); // remove card from deck
+    td.classes.toggle("card-in-deck");
+    td.classes.toggle("card-removed");
+    td.children.add(new SpanElement()..text = " [undo]");
+  });   //add listener to remove card from character deck
+
+  characterCardCount++; // increment number of cards in player deck
+  if(characterCardCount > 0 )  saveDeck.classes.remove("hide");
+
+  if (characterCardCount.isOdd) {
+    var tr = new TableRowElement();  // create new table row
+    characterDeckTable.children.add(tr);
+    tr.children.add (td);  // add table cell
+    } else {
+    // elseif card count even
+    characterDeckTable.lastChild.append(td);  // select last table rowl
+    }
+}
+
+//TODO https://www.dartlang.org/samples/#html5_persistence
+
+
+/***********
+ ** Helpers **
+ ***********/
+
+TableCellElement createTableCell (card) { // returns an html  <td> constructed from a card
   String cardText= "${card._cardName} (${card._set}) [x${card._amount}]";
-  var td = new TableCellElement();
+  TableCellElement td = new TableCellElement();
    td..setAttribute("class","card")
         ..setAttribute("data-name", "${card._cardName}")
         ..setAttribute("data-set", "${card._set}")
@@ -100,7 +150,7 @@ TableCellElement createTableCell (card) {
    return td;
 }
 
-TableCellElement createTableCellNameOnly (card) {
+TableCellElement createTableCellNameOnly (card) {  // as above but only writes the card name and set in the cell
   String cardText= "${card._cardName} (${card._set})";
   var td = new TableCellElement();
    td..setAttribute("class","card")
@@ -110,37 +160,6 @@ TableCellElement createTableCellNameOnly (card) {
         ..text = cardText;
    return td;
 }
-
-void pickCard (Event e) {
-  String cardName = (e.target as TableCellElement).attributes['data-name'].toString();
-  Element card = new DivElement()..text = cardName;
-  card.setAttribute("class",  "card-in-deck");
-  card.onClick.listen(removeCardFromDeck);
-  querySelector('#character-deck').children.add(card);
-}
-
-void addCardToCharacterDeck (Event e) {
-  TableElement deckTable = querySelector(' div#character-deck table.deck-table'); // target the appropriate div and table
-  // cardcount++
-  // if card count odd
-    // create new table row
-   // create table cell
-   // add table cell
-  // elseif card count even
-    // add table cell
-}
-
-void removeCardFromCharacterDeck(Event e) {
-  // cardcount--
-}
-
-void removeCardFromDeck(Event e) {
-  querySelector('#character-deck').children.remove(e.target);
-
-}
-
-//TODO https://www.dartlang.org/samples/#html5_persistence
-
 /***********
  ** Classes **
  ***********/
@@ -167,3 +186,7 @@ class BoonCard {
 
   }
 }
+
+//MyObject o;
+//o.the_argument = 1
+//querySelector("elm").onClick.listen((event) => doShit(o.the_argument));

@@ -62,10 +62,10 @@ p.boon-type {
 p.header {
   font-size: 16px;
   display: inline-block;
-  margin: 5px 0 5px 0;
+  margin: 10px 0 10px 0;
 }
 
-table {
+table.deck-table {
   width: 450px;
   border-collapse: collapse;
   border-bottom: 2px solid #dd8c11;
@@ -77,10 +77,12 @@ table {
 
 }
 
-th {
-  background-color: #dd8c11;
+table.character-deck-table {
+  width: 400px;
+  border-collapse: collapse;
+  table-layout: fixed;
+  border: hidden;
 }
-
 
 td, th {
   border: 1px solid #999;
@@ -89,20 +91,42 @@ td, th {
   font-size: 11px;
 }
 
-td:hover { /* th:hover also if you wish */
+table.deck-table td:hover {
   background-color: #dd8c11;
+  cursor: default;
 }
 
-.boon-type:hover { /* th:hover also if you wish */
+table.character-deck-table td{
+    overflow: hidden;
+    width: 200px;
+    border: none;
+}
+
+table.character-deck-table tr{
+  border: none;
+}
+
+.boon-type:hover {
   background-color: #dd8c11;
   cursor: pointer;
   font-weight: bold;
 }
 
-div.card-in-deck:hover {
-  text-decoration: line-through;
+td.card-removed span.undo {
+  text-decoration: none;
+  color : #dd8c11
 }
 
-tbody tr:nth-child(odd) {
+td.card-in-deck:hover, .card-removed {
+  color:#dd8c11;
+  cursor: default;
+}
+
+
+table tr:nth-child(odd) {
   background: #eee;
+}
+
+.hide {
+  visibility: hidden;
 }
